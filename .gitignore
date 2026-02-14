@@ -1,0 +1,15 @@
+# ROS 2 build artifacts
+build/
+install/
+log/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Output data
+planblue_task_ws/output/images/*
+planblue_task_ws/output/metadata.json
+
+# OS files
+.DS_Store
