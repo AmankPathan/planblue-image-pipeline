@@ -14,13 +14,26 @@ class ImageSubscriber(Node):
 
     def image_callback(self, msg: Image):
         try:
-            image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
-            frame_id = msg.header.frame_id
-            timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+            # Convert image (even though we don't use it yet)
+            _ = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
+
+            # Parse frame ID safely
+            try:
+                frame_id = int(msg.header.frame_id)
+            except ValueError:
+                self.get_logger().error(
+                    f'Invalid frame_id received: {msg.header.frame_id}'
+                )
+                return
+
+            # Extract timestamp
+            stamp = msg.header.stamp
+            timestamp_sec = stamp.sec + stamp.nanosec * 1e-9
 
             self.get_logger().info(
-                f'Received frame {frame_id} at {timestamp:.6f}'
+                f'Received frame_id={frame_id} timestamp={timestamp_sec:.6f}'
             )
+
         except Exception as e:
             self.get_logger().error(f'Failed to process image: {e}')
 
@@ -33,3 +46,5 @@ def main():
         node.get_logger().info('Image subscriber stopped by user')
     finally:
         node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()

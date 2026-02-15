@@ -19,21 +19,29 @@ class ImagePublisher(Node):
         self.get_logger().info('Image publisher started')
 
     def publish_image(self):
-        # Synthetic image generation (RGB)
-        image = np.random.randint(0, 256, (480, 640, 3), dtype=np.uint8)
+        # Generate synthetic image (RGB)
+        image = np.random.randint(
+            0, 256, (480, 640, 3), dtype=np.uint8
+        )
 
-        # Convert opencv to ROS image
+        # Get timestamp once
+        now = self.get_clock().now()
+        timestamp_msg = now.to_msg()
+
+        # Convert to ROS Image message
         msg = self.bridge.cv2_to_imgmsg(image, encoding='rgb8')
-        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.header.stamp = timestamp_msg
         msg.header.frame_id = str(self.frame_id)
 
-        try:
-            self.publisher_.publish(msg)
-            timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
-            self.get_logger().info(f'Published frame {self.frame_id} at {timestamp:.6f}')
-            self.frame_id += 1
-        except Exception as e:
-            self.get_logger().error(f'Failed to publish image: {e}')
+        self.publisher_.publish(msg)
+
+        timestamp_sec = timestamp_msg.sec + timestamp_msg.nanosec * 1e-9
+        self.get_logger().info(
+            f'Published frame_id={self.frame_id} timestamp={timestamp_sec:.6f}'
+        )
+
+        self.frame_id += 1
+
 
 def main():
     rclpy.init()
