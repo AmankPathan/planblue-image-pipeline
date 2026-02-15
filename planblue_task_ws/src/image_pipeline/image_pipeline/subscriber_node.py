@@ -105,8 +105,11 @@ class ImageSubscriber(Node):
                 self.get_logger().error(f'Failed to write metadata for frame_id={frame_id}: {e}')
                 return
 
-            self.get_logger().info(f'Saved frame_id={frame_id} image and metadata')
-
+            self.get_logger().info(
+                f'Saved frame_id={frame_id} '
+                f'timestamp={timestamp_human} '
+                f'path={file_path}'
+            )
         except Exception as e:
             self.get_logger().error(f'Failed to process image: {e}')
 
