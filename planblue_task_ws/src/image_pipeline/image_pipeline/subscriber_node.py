@@ -3,6 +3,7 @@ from rclpy.node import Node
 
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+import cv2
 
 class ImageSubscriber(Node):
     def __init__(self):
@@ -15,7 +16,7 @@ class ImageSubscriber(Node):
     def image_callback(self, msg: Image):
         try:
             # Convert image (even though we don't use it yet)
-            _ = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
+            image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
 
             # Parse frame ID safely
             try:
@@ -29,6 +30,19 @@ class ImageSubscriber(Node):
             # Extract timestamp
             stamp = msg.header.stamp
             timestamp_sec = stamp.sec + stamp.nanosec * 1e-9
+
+            # Prepare overlay text and put on image 
+            overlay_text = f'Timestamp: {timestamp_sec:.6f}'
+            cv2.putText(
+                image,
+                overlay_text,
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.8,
+                (0, 255, 0),
+                2,
+                cv2.LINE_AA
+            )
 
             self.get_logger().info(
                 f'Received frame_id={frame_id} timestamp={timestamp_sec:.6f}'
