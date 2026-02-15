@@ -9,7 +9,6 @@ __pycache__/
 
 # Output data
 planblue_task_ws/output/images/*
-planblue_task_ws/output/metadata.json
 
 # OS files
 .DS_Store
