@@ -21,19 +21,20 @@ class ImageSubscriber(Node):
 
         # File handling for metadata
         self.metadata_path = os.path.join(os.getcwd(), 'output', 'metadata.json')
-        if not os.path.exists(self.metadata_path):
-            with open(self.metadata_path, 'w') as f:
-                json.dump([], f, indent=2)
-        else:
-            try:
-                with open(self.metadata_path, 'r') as f:
-                    json.load(f)
-            except json.JSONDecodeError:
-                self.get_logger().warn(
-                    'Metadata file invalid or empty, reinitializing'
-                )
-                with open(self.metadata_path, 'w') as f:
-                    json.dump([], f, indent=2)
+        os.makedirs(os.path.dirname(self.metadata_path), exist_ok=True)
+
+        # Reset output directory and metadata on startup
+        self.get_logger().info('Resetting output images and metadata')
+
+        # Clear images directory
+        for filename in os.listdir(self.output_dir):
+            file_path = os.path.join(self.output_dir, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
+        # Reset metadata file
+        with open(self.metadata_path, 'w') as f:
+            json.dump([], f, indent=2)
 
     def image_callback(self, msg: Image):
         try:
