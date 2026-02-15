@@ -113,7 +113,8 @@ After running the system, output files are saved to:
 * Entries:
    * `frame_id`
    * `filename`
-   * `timestamp`
+   * `timestamp_unix`
+   * `timestamp_human_utc`
 
 ## Notes
 * Output directories are recreated on subscriber startup.

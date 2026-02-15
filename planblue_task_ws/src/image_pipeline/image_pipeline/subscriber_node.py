@@ -6,6 +6,7 @@ from cv_bridge import CvBridge
 import cv2
 import os
 import json
+from datetime import datetime, timezone
 
 class ImageSubscriber(Node):
     def __init__(self):
@@ -51,9 +52,11 @@ class ImageSubscriber(Node):
             # Extract timestamp
             stamp = msg.header.stamp
             timestamp_sec = stamp.sec + stamp.nanosec * 1e-9
+            dt = datetime.fromtimestamp(timestamp_sec, tz=timezone.utc)
+            timestamp_human = dt.strftime('%Y-%m-%d %H:%M:%S.%f')
 
             # Prepare overlay text
-            overlay_text = f'Timestamp: {timestamp_sec:.6f}'
+            overlay_text = f'Time: {timestamp_human} UTC'
 
             # Overlay timestamp on image
             cv2.putText(
@@ -62,13 +65,13 @@ class ImageSubscriber(Node):
                 (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.8,
-                (0, 255, 0),
+                (0, 0, 0),
                 2,
                 cv2.LINE_AA
             )
 
             # Build output filename
-            filename = f'frame_{frame_id}_{timestamp_sec:.6f}.png'
+            filename = f'frame_{frame_id}.png'
             file_path = os.path.join(self.output_dir, filename)
 
             # Save image to disk
@@ -81,7 +84,8 @@ class ImageSubscriber(Node):
             metadata_entry = {
                 'frame_id': frame_id,
                 'filename': filename,
-                'timestamp': timestamp_sec
+                'timestamp': timestamp_sec,
+                'timestamp_human_utc': timestamp_human
             }
 
             try:
