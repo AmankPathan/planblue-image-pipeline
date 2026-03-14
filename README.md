@@ -1,6 +1,6 @@
-# PlanBlue Image Pipeline – ROS 2 Take-Home Task
+# ROS-Vision-Pipe
 
-This repository contains a ROS 2 (Humble) project implementing a simple distributed image processing pipeline using two nodes.
+A ROS 2 (Humble) project implementing a simple distributed image processing pipeline using two nodes.
 
 The system consists of:
 - An image publisher node that continuously generates synthetic images
@@ -22,7 +22,7 @@ The system consists of:
 - Saves metadata (frame ID, filename, timestamp) to a JSON file
 - Logs processing activity
 
-On each run, the subscriber clears previous outputs to ensure deterministic results.
+On each run, the subscriber clears previous outputs to ensure clean results.
 
 ---
 
@@ -37,57 +37,61 @@ On each run, the subscriber clears previous outputs to ensure deterministic resu
 ---
 
 ## Repository Structure
-
 ```text
-planblue-image-pipeline/
+ros-vision-pipe/
 ├── README.md
-├── planblue_task_ws/
+├── task_ws/
 │   ├── src/
 │   │   └── image_pipeline/
 │   │       ├── image_pipeline/
-│   │       │   ├── publisher_node.py    
-│   │       │   └── subscriber_node.py   
-│   │       ├── package.xml              
-│   │       └── setup.py                 
-│   └── output/                          
-│       ├── images/                      
-│       └── metadata.json               
+│   │       │   ├── publisher_node.py
+│   │       │   └── subscriber_node.py
+│   │       ├── package.xml
+│   │       └── setup.py
+│   └── output/
+│       ├── images/
+│       └── metadata.json
 ```
+
+---
+
+## Prerequisites
+
+- Ubuntu 22.04
+- ROS 2 Humble
+- Python 3.10+
+```bash
+sudo apt install ros-humble-cv-bridge python3-opencv python3-colcon-common-extensions
+```
+
 ---
 
 ## Installation
-
-### ROS 2 Humble
-
-Install ROS 2 Humble on Ubuntu 22.04 following the official ROS documentation.
-
-Install required dependencies:
-
-```bash
-sudo apt install ros-humble-cv-bridge python3-opencv
-```
-## Clone the Repository
 ```bash
 git clone <repository-url>
-cd planblue-image-pipeline
+cd ros-vision-pipe
 ```
+
+---
 
 ## Build Instructions
 ```bash
 source /opt/ros/humble/setup.bash
-cd planblue_task_ws
-colcon build
+cd task_ws
+colcon build --symlink-install
 source install/setup.bash
 ```
 
+---
+
 ## Running the System
 
-Open two terminals.
+Start the subscriber first, then the publisher in a second terminal.
 
 ### Terminal 1 – Subscriber Node
 ```bash
 source /opt/ros/humble/setup.bash
-cd planblue-image-pipeline/planblue_task_ws
+cd ros-vision-pipe/task_ws
 source install/setup.bash
 ros2 run image_pipeline image_subscriber
 ```
@@ -95,28 +99,29 @@ ros2 run image_pipeline image_subscriber
 ### Terminal 2 – Publisher Node
 ```bash
 source /opt/ros/humble/setup.bash
-cd planblue-image-pipeline/planblue_task_ws
+cd ros-vision-pipe/task_ws
 source install/setup.bash
 ros2 run image_pipeline image_publisher
 ```
 
+---
+
 ## Output
 
-After running the system, output files are saved to:
+Output is saved to `task_ws/output/` and is reset on every subscriber startup.
 
 ### Images
-* Location: `planblue_task_ws/output/images/`
-* Format: PNG images with timestamp overlay
+- Location: `task_ws/output/images/`
+- Format: PNG with timestamp overlay
 
 ### Metadata
-* Location: `planblue_task_ws/output/metadata.json`
-* Entries:
-   * `frame_id`
-   * `filename`
-   * `timestamp_unix`
-   * `timestamp_human_utc`
+- Location: `task_ws/output/metadata.json`
+- Fields: `frame_id`, `filename`, `timestamp_unix`, `timestamp_human_utc`
+
+---
 
 ## Notes
-* Output directories are recreated on subscriber startup.
-* Images and metadata from previous runs are overwritten.
-* Both nodes log their activity to the console.
+
+- Always start the subscriber before the publisher
+- Output from previous runs is cleared on startup
+- Both nodes log activity to the console
