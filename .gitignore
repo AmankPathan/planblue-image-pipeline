@@ -8,7 +8,11 @@ __pycache__/
 *.pyc
 
 # Output data
-planblue_task_ws/output/images/*
+task_ws/output/images/*
+task_ws/output/metadata.json
+
+# VSCode
+.vscode/
 
 # OS files
 .DS_Store
